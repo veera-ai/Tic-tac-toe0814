@@ -22,13 +22,7 @@ export default function Board({ board, onMove, disabled, winningLine, invalidInd
     }
   }, [board]);
 
-  const rows = useMemo(() => {
-    return [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8]
-    ];
-  }, []);
+  const indices = useMemo(() => Array.from({ length: 9 }, (_, i) => i), []);
 
   const handleKeyDown = (e, index) => {
     const col = index % 3;
@@ -75,29 +69,32 @@ export default function Board({ board, onMove, disabled, winningLine, invalidInd
       role="grid"
       aria-label="Tic Tac Toe board with nine squares"
       aria-describedby="board-instructions"
+      aria-rowcount={3}
+      aria-colcount={3}
     >
       <span id="board-instructions" className="visually-hidden">
         Use arrow keys to move focus. Press Enter or Space to place your mark.
+        Grid is three rows by three columns.
       </span>
-      {rows.map((r, rIdx) => (
-        <div role="row" key={`row-${rIdx}`} aria-label={`Row ${rIdx + 1}`}>
-          {r.map((idx, cIdx) => (
-            <Square
-              key={idx}
-              ref={buttonRefs.current[idx]}
-              value={board[idx]}
-              index={idx}
-              row={rIdx}
-              col={cIdx}
-              onClick={() => onMove(idx)}
-              onKeyDown={(e) => handleKeyDown(e, idx)}
-              disabled={disabled}
-              highlight={Array.isArray(winningLine) ? winningLine.includes(idx) : false}
-              invalid={invalidIndex === idx}
-            />
-          ))}
-        </div>
-      ))}
+      {indices.map((idx) => {
+        const r = Math.floor(idx / 3);
+        const c = idx % 3;
+        return (
+          <Square
+            key={idx}
+            ref={buttonRefs.current[idx]}
+            value={board[idx]}
+            index={idx}
+            row={r}
+            col={c}
+            onClick={() => onMove(idx)}
+            onKeyDown={(e) => handleKeyDown(e, idx)}
+            disabled={disabled}
+            highlight={Array.isArray(winningLine) ? winningLine.includes(idx) : false}
+            invalid={invalidIndex === idx}
+          />
+        );
+      })}
     </div>
   );
 }
